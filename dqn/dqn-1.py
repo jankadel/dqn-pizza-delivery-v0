@@ -47,12 +47,12 @@ class ReplayMemory(object):
 class DQN(nn.Module):
     def __init__(self, height, width, outputs) -> None:
         super(DQN, self).__init__()
-        # (6,4;3,1;2,1)
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=6, stride=4)
+        # Convolutional Layer Parameters: (6,4;3,1;2,1) for 100px img, (5,4;3,2;2,2) for 40px img
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
-        self.conv3 = nn.Conv2d(32, 32, kernel_size=2, stride=1)
+        self.conv3 = nn.Conv2d(32, 32, kernel_size=2, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
 
         self.pool = nn.MaxPool2d(2, 2)
@@ -78,11 +78,11 @@ class DQN(nn.Module):
 
 
 resize = T.Compose([T.ToPILImage(),
-                    T.Resize(100, interpolation=Image.CUBIC),
+                    T.Resize(40, interpolation=Image.CUBIC),
                     T.ToTensor()])
 
 def get_screen(img=None):
-    if not img:
+    if img is None:
         screen = ENV.render() # type(screen) = pygame.Surface
         width = screen.get_width()
         height = screen.get_height()
@@ -296,4 +296,4 @@ def infer(episodes:int, model_path:str):
 
 
 #train(num_episodes=1000)
-infer(episodes=10000, model_path="./models/exp2_models/q_net_eps_7.txt")
+infer(episodes=10000, model_path="./models/q_net_eps_7.txt")

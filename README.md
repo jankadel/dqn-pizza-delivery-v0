@@ -24,3 +24,10 @@ and then use the following command:
 `pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html` 
 
 Now everything is set up and ready for use!
+
+## Data
+
+Data of pre-trained models can be downloaded here: https://drive.google.com/file/d/1U13u8G6LriU0cQdIRFWctRi165UAQ-WS/view?usp=sharing
+The data could not be uploaded to GitHub because it is simply too large.
+
+## Usage
