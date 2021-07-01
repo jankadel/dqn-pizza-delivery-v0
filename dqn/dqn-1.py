@@ -264,6 +264,7 @@ def infer(episodes:int, model_path:str):
     model = DQN(screen_height, screen_width, num_actions)
     model.load_state_dict(torch.load(model_path))
     model.eval()
+    model.to(DEVICE)
     rewards = []
     sum_reward = 0
 
@@ -273,7 +274,7 @@ def infer(episodes:int, model_path:str):
     for i in range(episodes):
         current_screen = get_screen()
         state = current_screen - last_screen
-        action = get_action(state)
+        action = predict(state, model)
         obs, reward, done, _ = ENV.step(action.item())
 
         sum_reward += reward
@@ -294,6 +295,7 @@ def infer(episodes:int, model_path:str):
 
     plt.show()
 
+# Outcomment and run python file for usage
 
 #train(num_episodes=1000)
 infer(episodes=10000, model_path="./models/q_net_eps_7.txt")

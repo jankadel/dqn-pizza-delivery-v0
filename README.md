@@ -30,4 +30,8 @@ Now everything is set up and ready for use!
 Data of pre-trained models can be downloaded here: https://drive.google.com/file/d/1U13u8G6LriU0cQdIRFWctRi165UAQ-WS/view?usp=sharing
 The data could not be uploaded to GitHub because it is simply too large.
 
+To use the data, just copy the *.txt files into the respective folders of the repository, i.e. models/model.txt(from zip archive) -> models/model.txt(repo) 
+
 ## Usage
+
+To run the reinforcement learning algorithms, simply scroll down to the end of each file within the folder `dqn` and (un)comment the functions you want to run. Now add possible parameters, i.e. number of episodes or pre-trained model path. Then, if everything is set, save the file and run it with a Python interpreter.

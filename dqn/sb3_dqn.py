@@ -64,5 +64,7 @@ def inference_sb3_dqn(path="./sb3_models/dqn_1m.txt", eps=10000):
 
     env.close()
 
+# Outcomment and run python file for usage
+
 inference_sb3_dqn()
 #train_sb3_dqn()
