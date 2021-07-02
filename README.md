@@ -34,4 +34,14 @@ To use the data, just copy the *.txt files into the respective folders of the re
 
 ## Usage
 
-To run the reinforcement learning algorithms, simply scroll down to the end of each file within the folder `dqn` and (un)comment the functions you want to run. Now add possible parameters, i.e. number of episodes or pre-trained model path. Then, if everything is set, save the file and run it with a Python interpreter.
+For help, please run `python main.py -h`
+
+Example commands:
+
+`python main.py -m DQN -t -e 50` (train own DQN/DQL for 50 episodes)
+
+`python main.py -m DQN -i -e 50 -p models/q_net_eps_6.txt` (run DQN/DQL in inference mode for 50 episodes using models/q_net_eps_6.txt)
+
+`python main.py -m SB3DQN -i -e 50 -p sb3_models/dqn_1m.txt` (run SB3 DQN in inference mode for 50 episodes)
+
+`python main.py -m SB3DQN -t -e 50` (train SB3 DQN for 50 episodes)
