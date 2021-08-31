@@ -1,3 +1,4 @@
+# imports
 import gym
 import math
 import random
@@ -17,21 +18,33 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 
+# Set the environment to the pizza delivery environment
 ENV = gym.make("gym_pizza_delivery:gym_pizza_delivery-v0")
 
 IS_IPYTHON = 'inline' in matplotlib.get_backend()
 if IS_IPYTHON:
     from IPython import display
 
+# Enables GPU enhanced computing if available
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+# Define state-action transition
 TRANSITION = namedtuple('TRANSITION', ('state', 'action', 'follow_state', 'reward'))
 
 class ReplayMemory(object):
+    """
+    The replay memory contains (state, action, follow_state, reward) tuples of previously traversed states
+    """
+
     def __init__(self, size):
+        """
+        Initialize the replay memory as a deque (FIFO queue) with a fixed size
+        """
         self.memory = deque([], maxlen=size)
 
     def store(self, *args, keep=None):
+        """
+        Stores the state-action information tuple in the replay memory by appending it
+        """
         if keep and len(self.memory) != 0:
             head = self.memory.pop()
             self.memory.append(head)
@@ -39,13 +52,25 @@ class ReplayMemory(object):
             self.memory.append(TRANSITION(*args))
 
     def sample(self, range):
+        """
+        Returns a range of unique random samples of the replay memory
+        """
         return random.sample(self.memory, range)
 
     def __len__(self):
+        """
+        Adds a length attribute to the replay memory
+        """
         return len(self.memory)
 
 class DQN(nn.Module):
+    """
+    The DQN class defines the deep neural network used to approximate Q values (aka Q-network/Target-network)
+    """
     def __init__(self, height, width, outputs) -> None:
+        """
+        Initialize deep CNN with 3 convolutional layers, 3 batch normalizations and 1 max-pooling layer
+        """
         super(DQN, self).__init__()
         # Convolutional Layer Parameters: (6,4;3,1;2,1) for 100px img, (5,4;3,2;2,2) for 40px img
         self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
@@ -59,6 +84,9 @@ class DQN(nn.Module):
 
         #print(height, width)
         def get_conv2d_size(size, kernel_size=5, stride=2):
+            """
+            Get size of convolutional layer
+            """
             return (size-(kernel_size-1)-1) // stride+1
 
         conv_w = get_conv2d_size(get_conv2d_size(get_conv2d_size(width)))
@@ -69,6 +97,9 @@ class DQN(nn.Module):
         self.head = nn.Linear(lin_input_size, outputs)
 
     def forward(self, x):
+        """
+        Feed-forward function of neural network; Defines the CNN architecture by calling the layers sequentially on the input x.
+        """
         x = x.to(DEVICE)
         x = F.relu(self.bn1(self.pool(self.conv1(x))))
         x = F.relu(self.bn2(self.conv2(x)))
@@ -77,11 +108,18 @@ class DQN(nn.Module):
         return self.head(x.view(x.size(0), -1))
 
 class DQNagent:
+    """
+    Class that defines the agent that is controlled by the approximated Q-values of the DQN
+    """
     def __init__(self) -> None:
+        """
+        Initialization of the agent as well as relevant parameters for training.
+        """
         self.resize = T.Compose([T.ToPILImage(),
                         T.Resize(40, interpolation=Image.CUBIC),
                         T.ToTensor()])
 
+        # Initialize learning parameters
         self.batch_size = 128
         self.learning_rate = 0.001
         self.gamma = 0.999
@@ -100,17 +138,21 @@ class DQNagent:
 
         self.num_actions = ENV.action_space.n
         self.observation_space = ENV.observation_space
-    
+
+        # Initialize Q-network and target-network
         self.Q_net = DQN(self.screen_height, self.screen_width, self.num_actions).to(DEVICE)
         self.target_net = DQN(self.screen_height, self.screen_width, self.num_actions).to(DEVICE)
         self.target_net.load_state_dict(self.Q_net.state_dict())
         self.target_net.eval()
 
         self.optimizer = optim.RMSprop(self.Q_net.parameters(), lr=self.learning_rate)
-        
 
 
     def get_screen(self, img=None):
+        """
+        Helper function that allows to retrieve observations of the environment and convert
+        the observations into RGB-arrays.
+        """
         if img is None:
             screen = ENV.render() # type(screen) = pygame.Surface
             width = screen.get_width()
@@ -123,10 +165,11 @@ class DQNagent:
         screen = torch.from_numpy(img_arr)
         return self.resize(screen).unsqueeze(0)
 
-    #### CNN
-
 
     def get_action(self, state):
+        """
+        Function that determines the next action based on the epsilon-greedy strategy
+        """
         self.steps += 1
         sample = random.random()
         threshold = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(-1 * self.steps / self.decay)
@@ -137,6 +180,9 @@ class DQNagent:
             return torch.tensor([[random.randrange(self.num_actions)]], device=DEVICE, dtype=torch.long)
 
     def plot_durations(self):
+        """
+        Helper function that plots the number of steps for each episode (aka the duration)
+        """
         plt.figure(1)
         plt.clf()
         durations_t = torch.tensor(self.durations, dtype=torch.float)
@@ -149,12 +195,17 @@ class DQNagent:
             means = torch.cat((torch.zeros(99), means))
             plt.plot(means.numpy())
 
-        plt.pause(0.001)  # pause a bit so that plots are updated
+        # Add a small delay to ensure data is added to plot
+        plt.pause(0.001)
         if IS_IPYTHON:
             display.clear_output(wait=True)
             display.display(plt.gcf())
 
     def optimize(self):
+        """
+        Function to optimize the model for each step the agent takes. Optimization is performed in accordance to temporal difference learning
+        and Huber loss.
+        """
         if len(self.memory) < self.batch_size:
             return
         transitions = self.memory.sample(self.batch_size)
@@ -189,6 +240,9 @@ class DQNagent:
         return loss_val
 
     def train(self, num_episodes : int = 100):
+        """
+        Function to train the parameters of the DQN
+        """
         plt.ion()
         eps_rewards = []
         sum_rewards = 0
@@ -259,10 +313,16 @@ class DQNagent:
         plt.show()
 
     def predict(self, state, model):
+        """
+        Function that predicts an action on basis of a pre-trained model
+        """
         with torch.no_grad():
             return model(state).max(1)[1].view(1, 1)
 
     def infer(self, episodes:int, model_path:str):
+        """
+        Function that realizes the inference mode. The agent is controlled by a pre-trained model
+        """
         model = DQN(self.screen_height, self.screen_width, self.num_actions)
         model.load_state_dict(torch.load(model_path))
         model.eval()

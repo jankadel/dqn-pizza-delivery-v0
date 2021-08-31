@@ -32,6 +32,13 @@ The data could not be uploaded to GitHub because it is simply too large.
 
 To use the data, just copy the *.txt files into the respective folders of the repository, i.e. models/model.txt(from zip archive) -> models/model.txt(repo) 
 
+## Stable Baselines 3
+
+Stable Baselines3 (SB3) is a set of reliable implementations of reinforcement learning algorithms in PyTorch. It is the next major version of Stable Baselines.
+
+Github repository: https://github.com/DLR-RM/stable-baselines3
+Documentation: https://stable-baselines3.readthedocs.io/en/master/
+
 ## Usage
 
 For help, please run `python main.py -h`

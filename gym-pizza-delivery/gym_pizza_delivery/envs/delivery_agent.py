@@ -4,6 +4,9 @@ import copy
 
 
 class DeliveryAgent:
+    """
+    Class that defines the delivery agent and its behavior.
+    """
     def __init__(self, agent_file, map_file, pos, screen_width, screen_height):
         self.map = pygame.image.load(map_file)
         self.agent = pygame.image.load(agent_file)

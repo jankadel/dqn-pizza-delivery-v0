@@ -7,6 +7,10 @@ from stable_baselines3.common.evaluation import evaluate_policy
 env = gym.make("gym_pizza_delivery:gym_pizza_delivery-v0")
 
 
+# Code snippet that uses a stable implementation of PPO by stable_baselines3 (see: https://stable-baselines3.readthedocs.io/en/master/) 
+# This version of PPO is used as a benchmark for the own implementation of DQN - However it was not further pursued because PPO did not seem
+# to work properly on the environment "gym_pizza_delivery-v0"
+
 model = PPO(
     "CnnPolicy", 
     env, 

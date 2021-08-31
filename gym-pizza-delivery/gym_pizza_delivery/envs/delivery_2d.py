@@ -6,6 +6,9 @@ from gym_pizza_delivery.envs.delivery_agent import DeliveryAgent
 
 
 class PizzaDelivery2D:
+    """
+    Class that defines the graphical view of the pizza delivery environment as well as the environment (e.g. rewards, actions, results of actions, ...) itself. 
+    """
     def __init__(
         self,
         agent_file: str = None,

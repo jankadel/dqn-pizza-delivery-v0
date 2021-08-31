@@ -1,3 +1,4 @@
+# imports
 from time import time
 import gym
 from stable_baselines3 import DQN
@@ -6,10 +7,20 @@ from stable_baselines3.common.evaluation import evaluate_policy
 import matplotlib.pyplot as plt
 
 class SB3DQNagent:
+    """
+    Class that uses a stable implementation of DQN by stable_baselines3 (see: https://stable-baselines3.readthedocs.io/en/master/) 
+    This version of DQN is used as a benchmark for the own implementation of DQN
+    """
     def __init__(self) -> None:
+        """
+        Function to initialize the SB3DQNagent and here only the pizza delivery environment
+        """
         self.env = gym.make("gym_pizza_delivery:gym_pizza_delivery-v0")
 
     def train_sb3_dqn(self, timesteps):
+        """
+        Function that initializes the model and trains it.
+        """
         model = DQN(
             "CnnPolicy",
             self.env,
@@ -31,6 +42,9 @@ class SB3DQNagent:
 
 
     def inference_sb3_dqn(self, path="./sb3_models/dqn_1m.txt", eps=10000):
+        """
+        Function that uses a pre-trained model and runs it in inference mode.
+        """
         model = DQN(
             "CnnPolicy",
             self.env,
